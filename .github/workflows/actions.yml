@@ -1,0 +1,27 @@
+name: Deploy to Raspberry Pi
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Deploy to Raspberry Pi
+      run: |
+        source /home/pi/miniconda3/etc/profile.d/conda.sh
+        conda activate laser
+        # Stop the existing service
+        ssh -i ~/.ssh/id_rsa pi@raspberrypi 'sudo systemctl stop laser_app.service'
+        # Copy new code
+        rsync -avz -e "ssh -i ~/.ssh/id_rsa" . pi@raspberrypi:/home/pi/laser_app
+        # Restart the service
+        ssh -i ~/.ssh/id_rsa pi@raspberrypi 'sudo systemctl start laser_app.service'
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
