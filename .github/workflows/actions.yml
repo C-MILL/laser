@@ -18,6 +18,18 @@ jobs:
         conda activate laser
         conda info --envs
         python -V
+    - name: Setup SSH
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "${SSH_KEY}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H raspberrypi >> ~/.ssh/known_hosts
+    - name: Verify SSH Connection
+        run: |
+          ssh -i ~/.ssh/id_rsa pi@raspberrypi 'echo "SSH connection established"'
+
     - name: Deploy to Raspberry Pi
       run: |
         source /home/pi/miniforge3/etc/profile.d/conda.sh
