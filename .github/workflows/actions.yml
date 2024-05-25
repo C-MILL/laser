@@ -20,9 +20,14 @@ jobs:
         conda info --envs
         python -V
 
-    - name: Verify SSH Connection
+    - name: Setup SSH
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
       run: |
-        ssh -i ~/.ssh/id_rsa pi@raspberrypi 'echo "SSH connection established"'
+        mkdir -p ~/.ssh
+        echo "${SSH_KEY}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H raspberrypi >> ~/.ssh/known_hosts
 
     - name: Deploy to Raspberry Pi
       env:
