@@ -36,9 +36,10 @@ jobs:
         eval "$(ssh-agent -s)"
         ssh-add <(echo "${SSH_KEY}")
         ssh-keyscan -H raspberrypi >> ~/.ssh/known_hosts
-        # Stop the existing service
+        # Stop the existing service if any
         ssh pi@raspberrypi 'sudo systemctl stop laser_app.service'
         # Copy new code
         rsync -avz -e "ssh" . pi@raspberrypi:/home/pi/laser_app
-        # Restart the service
-        ssh pi@raspberrypi 'sudo systemctl start laser_app.service'
+        # Ensure the working directory is set correctly and restart the service
+        ssh pi@raspberrypi 'sudo systemctl daemon-reload && sudo systemctl start laser_app.service'
+
