@@ -12,7 +12,12 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
+    - name: Verify Conda Environment
+      run: |
+        source /home/pi/miniconda3/etc/profile.d/conda.sh
+        conda activate laser
+        conda info --envs
+        python -V
     - name: Deploy to Raspberry Pi
       run: |
         source /home/pi/miniforge3/etc/profile.d/conda.sh
