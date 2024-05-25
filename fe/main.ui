@@ -24,6 +24,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Test Button</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton_2">
        <property name="text">
         <string>Test Button 2</string>
@@ -42,13 +49,6 @@
         </size>
        </property>
       </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>Test Button</string>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>
