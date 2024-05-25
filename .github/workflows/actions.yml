@@ -12,25 +12,28 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+
     - name: Verify Conda Environment
       run: |
         source /home/pi/miniforge3/etc/profile.d/conda.sh
         conda activate laser
         conda info --envs
         python -V
+
     - name: Verify SSH Connection
-        run: |
-          ssh -i ~/.ssh/id_rsa pi@raspberrypi 'echo "SSH connection established"'
+      run: |
+        ssh -i ~/.ssh/id_rsa pi@raspberrypi 'echo "SSH connection established"'
+
     - name: Deploy to Raspberry Pi
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-        run: |
-          eval "$(ssh-agent -s)"
-          ssh-add <(echo "${SSH_KEY}")
-          ssh-keyscan -H raspberrypi >> ~/.ssh/known_hosts
-          # Stop the existing service
-          ssh pi@raspberrypi 'sudo systemctl stop laser_app.service'
-          # Copy new code
-          rsync -avz -e "ssh" . pi@raspberrypi:/home/pi/laser_app
-          # Restart the service
-          ssh pi@raspberrypi 'sudo systemctl start laser_app.service'
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+      run: |
+        eval "$(ssh-agent -s)"
+        ssh-add <(echo "${SSH_KEY}")
+        ssh-keyscan -H raspberrypi >> ~/.ssh/known_hosts
+        # Stop the existing service
+        ssh pi@raspberrypi 'sudo systemctl stop laser_app.service'
+        # Copy new code
+        rsync -avz -e "ssh" . pi@raspberrypi:/home/pi/laser_app
+        # Restart the service
+        ssh pi@raspberrypi 'sudo systemctl start laser_app.service'
