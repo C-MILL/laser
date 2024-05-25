@@ -1,6 +1,6 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow
-from PyQt6.uic import loadUi
+from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.uic import loadUi
 
 class MainWindow(QMainWindow):
     def __init__(self):
