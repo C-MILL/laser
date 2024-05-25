@@ -15,7 +15,6 @@ jobs:
 
     - name: Deploy to Raspberry Pi
       run: |
-        source /home/pi/miniconda3/etc/profile.d/conda.sh
         conda activate laser
         # Stop the existing service
         ssh -i ~/.ssh/id_rsa pi@raspberrypi 'sudo systemctl stop laser_app.service'
