@@ -1,0 +1,5 @@
+git checkout -b namevombranch	new branch		
+git status 			statusabfrage
+git add filename		Dokument hinzufügen
+git commit -am "message"	lokal commiten
+git push			von lokal auf remote
