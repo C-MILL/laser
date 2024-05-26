@@ -16,35 +16,16 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="ten_left">
       <property name="text">
-       <string>PushButton</string>
+       <string>10 Steps Left</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="label">
-      <property name="maximumSize">
-       <size>
-        <width>120</width>
-        <height>80</height>
-       </size>
-      </property>
+     <widget class="QPushButton" name="ten_right">
       <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>../../../Users/chrig/OneDrive/Bilder/Persönlich/2020/Triftgletscher/MIL_0574.jpg</pixmap>
-      </property>
-      <property name="scaledContents">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="pushButton_2">
-      <property name="text">
-       <string>PushButton</string>
+       <string>10 Steps Right</string>
       </property>
      </widget>
     </item>
