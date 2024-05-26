@@ -9,6 +9,7 @@ while True:
         string = string +"\n" #"\n" for line seperation
         string = string.encode('utf_8')
         ser.write(string)
+        print("  ")
         line = ser.readline().decode('utf-8').rstrip()
         print("received: ",line)
         time.sleep(1) #delay of 1 second
