@@ -13,15 +13,33 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Deploy to Raspberry Pi
+    - name: Verify Conda Environment
       run: |
-        source /home/pi/miniconda3/etc/profile.d/conda.sh
+        source /home/pi/miniforge3/etc/profile.d/conda.sh
         conda activate laser
-        # Stop the existing service
-        ssh -i ~/.ssh/id_rsa pi@raspberrypi 'sudo systemctl stop laser_app.service'
-        # Copy new code
-        rsync -avz -e "ssh -i ~/.ssh/id_rsa" . pi@raspberrypi:/home/pi/laser_app
-        # Restart the service
-        ssh -i ~/.ssh/id_rsa pi@raspberrypi 'sudo systemctl start laser_app.service'
+        conda info --envs
+        python -V
+
+    - name: Setup SSH
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "${SSH_KEY}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H raspberrypi >> ~/.ssh/known_hosts
+
+    - name: Deploy to Raspberry Pi
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+      run: |
+        eval "$(ssh-agent -s)"
+        ssh-add <(echo "${SSH_KEY}")
+        ssh-keyscan -H raspberrypi >> ~/.ssh/known_hosts
+        # Stop the existing service if any
+        ssh pi@raspberrypi 'sudo systemctl stop laser_app.service'
+        # Copy new code
+        rsync -avz -e "ssh" . pi@raspberrypi:/home/pi/laser_app
+        # Ensure the working directory is set correctly and restart the service
+        ssh pi@raspberrypi 'sudo systemctl daemon-reload && sudo systemctl start laser_app.service'
+
