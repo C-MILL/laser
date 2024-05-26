@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>278</width>
-    <height>324</height>
+    <width>286</width>
+    <height>258</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,6 +19,25 @@
      <widget class="QPushButton" name="pushButton">
       <property name="text">
        <string>PushButton</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="maximumSize">
+       <size>
+        <width>120</width>
+        <height>80</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../Users/chrig/OneDrive/Bilder/Persönlich/2020/Triftgletscher/MIL_0574.jpg</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
