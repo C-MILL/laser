@@ -24,7 +24,6 @@ long homePosition2 = 0; // Home position for stepper 2
 void setup()
 {
   Serial.begin(9600); // define baud rate
-  Serial.println("Testing Accelstepper"); // print a message
 
   // setting up some default values for maximum speed and maximum acceleration
   stepper1.setMaxSpeed(2000); // SPEED = Steps / second

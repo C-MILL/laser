@@ -26,7 +26,7 @@ class MainWindow(QMainWindow):
         self.motor2_right.clicked.connect(self.send_motor2_right)
         self.set_home.clicked.connect(self.set_home_position)
         self.move_home.clicked.connect(self.move_to_home)
-        self.reset_position_btn.clicked.connect(self.reset_position_command)  # Updated
+        self.reset_position_btn.clicked.connect(self.reset_position_command)
 
         # Disable command buttons initially
         self.ten_left.setEnabled(False)
@@ -74,7 +74,7 @@ class MainWindow(QMainWindow):
             # Test the connection
             self.ser.write(b'PING\n')
             print("Sent PING to ESP32.")
-            time.sleep(1)
+            time.sleep(1)  # Ensure there's enough delay for a response
             if self.ser.in_waiting > 0:
                 try:
                     response = self.ser.readline().decode('utf-8', errors='ignore').rstrip()
@@ -92,13 +92,15 @@ class MainWindow(QMainWindow):
                         self.reset_position_btn.setEnabled(True)
                         self.connectionStatusLabel.setText(f"Connection Status: Connected ({self.current_port})")
                     else:
-                        raise serial.SerialException("Unexpected response")
+                        print("Unexpected response")
+                        self.responseLabel.setText(f"Unexpected response: {response}")
                 except UnicodeDecodeError as e:
                     raw_response = self.ser.readline()
                     print(f"Decoding error: {e}, raw response: {raw_response}")
                     self.responseLabel.setText(f"Decoding error: {e}")
             else:
-                raise serial.SerialException("No response received")
+                print("No response received")
+                self.responseLabel.setText("No response received")
         except (serial.SerialException, OSError) as e:
             print(f"Connection check failed: {e}")
             self.pushButton.setStyleSheet("background-color: red")
@@ -140,7 +142,7 @@ class MainWindow(QMainWindow):
     def move_to_home(self):
         self.send_command('move_home')
 
-    def reset_position_command(self):  # Updated
+    def reset_position_command(self):
         self.send_command('reset_position')
 
     def send_command(self, command):
