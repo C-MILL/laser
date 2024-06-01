@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import QTimer
 import serial
+import serial.tools.list_ports
 
 
 class MainWindow(QMainWindow):
@@ -14,6 +15,7 @@ class MainWindow(QMainWindow):
 
         # Initialize serial connection to None
         self.ser = None
+        self.current_port = None
 
         # Bind buttons
         self.pushButton.clicked.connect(self.check_connection)
@@ -33,17 +35,32 @@ class MainWindow(QMainWindow):
         self.connectionStatusLabel = self.findChild(QLabel, 'connectionStatusLabel')
         self.responseLabel = self.findChild(QLabel, 'responseLabel')
 
+    def find_serial_port(self):
+        ports = serial.tools.list_ports.comports()
+        for port in ports:
+            if "USB" in port.device:
+                return port.device
+        return None
+
     def check_connection(self):
         try:
-            if self.ser is None:
-                # Try to establish the connection
-                self.ser = serial.Serial('/dev/ttyS0', 115200, timeout=1)
-                self.ser.flushInput()
-                self.ser.flushOutput()
-                print("Serial connection established.")
+            if self.ser is None or not self.ser.is_open:
+                # Find available serial port
+                port = self.find_serial_port()
+                if port:
+                    print(f"Attempting to open serial connection on {port}...")
+                    self.ser = serial.Serial(port, 115200, timeout=1)
+                    self.ser.flushInput()
+                    self.ser.flushOutput()
+                    self.current_port = port
+                    print(f"Serial connection established on {port}.")
+                    self.connectionStatusLabel.setText(f"Connection Status: Connected ({port})")
+                else:
+                    raise serial.SerialException("No USB serial ports found.")
 
             # Test the connection
             self.ser.write(b'PING\n')
+            print("Sent PING to ESP32.")
             time.sleep(1)
             if self.ser.in_waiting > 0:
                 response = self.ser.readline().decode('utf-8').rstrip()
@@ -52,7 +69,7 @@ class MainWindow(QMainWindow):
                     self.pushButton.setStyleSheet("background-color: green")
                     self.ten_left.setEnabled(True)
                     self.ten_right.setEnabled(True)
-                    self.connectionStatusLabel.setText("Connection Status: Connected")
+                    self.connectionStatusLabel.setText(f"Connection Status: Connected ({self.current_port})")
                 else:
                     raise serial.SerialException("Unexpected response")
             else:
