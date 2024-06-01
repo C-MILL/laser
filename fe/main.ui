@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -61,6 +61,27 @@
      <widget class="QPushButton" name="motor2_right">
       <property name="text">
        <string>Motor 2 - 100 Steps Right</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="set_home">
+      <property name="text">
+       <string>Set Home Position</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="move_home">
+      <property name="text">
+       <string>Move to Home Position</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="reset_position">
+      <property name="text">
+       <string>Reset Position</string>
       </property>
      </widget>
     </item>
