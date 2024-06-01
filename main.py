@@ -56,7 +56,7 @@ class MainWindow(QMainWindow):
                 port = self.find_serial_port()
                 if port:
                     print(f"Attempting to open serial connection on {port}...")
-                    self.ser = serial.Serial(port, 9600, timeout=1)
+                    self.ser = serial.Serial(port, 115200, timeout=1)
                     self.ser.flushInput()
                     self.ser.flushOutput()
                     self.current_port = port
@@ -71,7 +71,7 @@ class MainWindow(QMainWindow):
             time.sleep(1)
             if self.ser.in_waiting > 0:
                 try:
-                    response = self.ser.readline().decode('utf-8').rstrip()
+                    response = self.ser.readline().decode('utf-8', errors='ignore').rstrip()
                     print(f"Received from ESP32: {response}")
                     if response == "PONG":
                         self.pushButton.setStyleSheet("background-color: green")
@@ -131,7 +131,7 @@ class MainWindow(QMainWindow):
                 self.responseLabel.setText(f"Sent: {command.strip()}")
                 time.sleep(1)
                 if self.ser.in_waiting > 0:
-                    response = self.ser.readline().decode('utf-8').rstrip()
+                    response = self.ser.readline().decode('utf-8', errors='ignore').rstrip()
                     print(f"Received: {response}")
                     self.responseLabel.setText(f"Received: {response}")
                 else:
