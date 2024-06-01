@@ -12,7 +12,7 @@ class MainWindow(QMainWindow):
         loadUi('fe/main.ui', self)
 
         # Initialize serial connection
-        self.ser = serial.Serial('/dev/ttyS0', 115200, timeout=1)  # Adjust the port as necessary
+        self.ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)  # Adjust the port as necessary
 
         # Bind buttons
         self.ten_left.clicked.connect(self.send_ten_left)
