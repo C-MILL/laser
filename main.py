@@ -24,9 +24,6 @@ class MainWindow(QMainWindow):
         self.motor1_right.clicked.connect(self.send_motor1_right)
         self.motor2_left.clicked.connect(self.send_motor2_left)
         self.motor2_right.clicked.connect(self.send_motor2_right)
-        self.set_home.clicked.connect(self.set_home_position)
-        self.move_home.clicked.connect(self.move_to_home)
-        self.reset_position_btn.clicked.connect(self.reset_position_command)
 
         # Disable command buttons initially
         self.ten_left.setEnabled(False)
@@ -35,9 +32,6 @@ class MainWindow(QMainWindow):
         self.motor1_right.setEnabled(False)
         self.motor2_left.setEnabled(False)
         self.motor2_right.setEnabled(False)
-        self.set_home.setEnabled(False)
-        self.move_home.setEnabled(False)
-        self.reset_position_btn.setEnabled(False)
 
         # Set up a timer to periodically check the connection
         self.timer = QTimer(self)
@@ -87,9 +81,6 @@ class MainWindow(QMainWindow):
                         self.motor1_right.setEnabled(True)
                         self.motor2_left.setEnabled(True)
                         self.motor2_right.setEnabled(True)
-                        self.set_home.setEnabled(True)
-                        self.move_home.setEnabled(True)
-                        self.reset_position_btn.setEnabled(True)
                         self.connectionStatusLabel.setText(f"Connection Status: Connected ({self.current_port})")
                     else:
                         print("Unexpected response")
@@ -110,40 +101,28 @@ class MainWindow(QMainWindow):
             self.motor1_right.setEnabled(False)
             self.motor2_left.setEnabled(False)
             self.motor2_right.setEnabled(False)
-            self.set_home.setEnabled(False)
-            self.move_home.setEnabled(False)
-            self.reset_position_btn.setEnabled(False)
             self.connectionStatusLabel.setText("Connection Status: Not Connected")
             if self.ser is not None:
                 self.ser.close()
                 self.ser = None
 
     def send_ten_left(self):
-        self.send_command('s 10 200')  # Example command for 10 steps left with speed 200
+        self.send_command('s10 200')  # Example command for 10 steps left with speed 200
 
     def send_ten_right(self):
-        self.send_command('c 10 200')  # Example command for 10 steps right with speed 200
+        self.send_command('c10 200')  # Example command for 10 steps right with speed 200
 
     def send_motor1_left(self):
-        self.send_command('p 100 200')  # 100 steps left for motor 1 with speed 200
+        self.send_command('p100 200')  # 100 steps left for motor 1 with speed 200
 
     def send_motor1_right(self):
-        self.send_command('c 100 200')  # 100 steps right for motor 1 with speed 200
+        self.send_command('c100 200')  # 100 steps right for motor 1 with speed 200
 
     def send_motor2_left(self):
-        self.send_command('b 100 200')  # 100 steps left for motor 2 with speed 200
+        self.send_command('b100 200')  # 100 steps left for motor 2 with speed 200
 
     def send_motor2_right(self):
-        self.send_command('c 100 200')  # 100 steps right for motor 2 with speed 200
-
-    def set_home_position(self):
-        self.send_command('set_home')
-
-    def move_to_home(self):
-        self.send_command('move_home')
-
-    def reset_position_command(self):
-        self.send_command('reset_position')
+        self.send_command('c100 200')  # 100 steps right for motor 2 with speed 200
 
     def send_command(self, command):
         if self.ser and self.ser.is_open:
