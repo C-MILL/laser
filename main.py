@@ -56,7 +56,7 @@ class MainWindow(QMainWindow):
                 port = self.find_serial_port()
                 if port:
                     print(f"Attempting to open serial connection on {port}...")
-                    self.ser = serial.Serial(port, 115200, timeout=1)
+                    self.ser = serial.Serial(port, 9600, timeout=1)
                     self.ser.flushInput()
                     self.ser.flushOutput()
                     self.current_port = port
@@ -70,19 +70,24 @@ class MainWindow(QMainWindow):
             print("Sent PING to ESP32.")
             time.sleep(1)
             if self.ser.in_waiting > 0:
-                response = self.ser.readline().decode('utf-8').rstrip()
-                print(f"Received from ESP32: {response}")
-                if response == "PONG":
-                    self.pushButton.setStyleSheet("background-color: green")
-                    self.ten_left.setEnabled(True)
-                    self.ten_right.setEnabled(True)
-                    self.motor1_left.setEnabled(True)
-                    self.motor1_right.setEnabled(True)
-                    self.motor2_left.setEnabled(True)
-                    self.motor2_right.setEnabled(True)
-                    self.connectionStatusLabel.setText(f"Connection Status: Connected ({self.current_port})")
-                else:
-                    raise serial.SerialException("Unexpected response")
+                try:
+                    response = self.ser.readline().decode('utf-8').rstrip()
+                    print(f"Received from ESP32: {response}")
+                    if response == "PONG":
+                        self.pushButton.setStyleSheet("background-color: green")
+                        self.ten_left.setEnabled(True)
+                        self.ten_right.setEnabled(True)
+                        self.motor1_left.setEnabled(True)
+                        self.motor1_right.setEnabled(True)
+                        self.motor2_left.setEnabled(True)
+                        self.motor2_right.setEnabled(True)
+                        self.connectionStatusLabel.setText(f"Connection Status: Connected ({self.current_port})")
+                    else:
+                        raise serial.SerialException("Unexpected response")
+                except UnicodeDecodeError as e:
+                    raw_response = self.ser.readline()
+                    print(f"Decoding error: {e}, raw response: {raw_response}")
+                    self.responseLabel.setText(f"Decoding error: {e}")
             else:
                 raise serial.SerialException("No response received")
         except (serial.SerialException, OSError) as e:
