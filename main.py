@@ -1,6 +1,6 @@
 import sys
 import time
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import QTimer
 import serial
@@ -29,6 +29,10 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.check_connection)
         self.timer.start(5000)  # Check every 5 seconds
 
+        # Access labels
+        self.connectionStatusLabel = self.findChild(QLabel, 'connectionStatusLabel')
+        self.responseLabel = self.findChild(QLabel, 'responseLabel')
+
     def check_connection(self):
         try:
             if self.ser is None:
@@ -36,24 +40,29 @@ class MainWindow(QMainWindow):
                 self.ser = serial.Serial('/dev/ttyS0', 115200, timeout=1)
                 self.ser.flushInput()
                 self.ser.flushOutput()
-                self.pushButton.setStyleSheet("background-color: green")
-                self.ten_left.setEnabled(True)
-                self.ten_right.setEnabled(True)
+                print("Serial connection established.")
+
             # Test the connection
             self.ser.write(b'PING\n')
             time.sleep(1)
             if self.ser.in_waiting > 0:
                 response = self.ser.readline().decode('utf-8').rstrip()
+                print(f"Received from ESP32: {response}")
                 if response == "PONG":
                     self.pushButton.setStyleSheet("background-color: green")
                     self.ten_left.setEnabled(True)
                     self.ten_right.setEnabled(True)
+                    self.connectionStatusLabel.setText("Connection Status: Connected")
                 else:
                     raise serial.SerialException("Unexpected response")
-        except (serial.SerialException, OSError):
+            else:
+                raise serial.SerialException("No response received")
+        except (serial.SerialException, OSError) as e:
+            print(f"Connection check failed: {e}")
             self.pushButton.setStyleSheet("background-color: red")
             self.ten_left.setEnabled(False)
             self.ten_right.setEnabled(False)
+            self.connectionStatusLabel.setText("Connection Status: Not Connected")
             if self.ser is not None:
                 self.ser.close()
                 self.ser = None
@@ -70,14 +79,18 @@ class MainWindow(QMainWindow):
                 command += '\n'
                 self.ser.write(command.encode('utf-8'))
                 print(f"Sent: {command.strip()}")
+                self.responseLabel.setText(f"Sent: {command.strip()}")
                 time.sleep(1)
                 if self.ser.in_waiting > 0:
                     response = self.ser.readline().decode('utf-8').rstrip()
                     print(f"Received: {response}")
+                    self.responseLabel.setText(f"Received: {response}")
                 else:
                     print("No response received.")
+                    self.responseLabel.setText("No response received.")
             except Exception as e:
                 print(f"Error during communication: {e}")
+                self.responseLabel.setText(f"Error: {e}")
 
 
 if __name__ == "__main__":
