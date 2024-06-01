@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>754</width>
+    <width>400</width>
     <height>300</height>
    </rect>
   </property>
@@ -37,22 +37,32 @@
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>PositionX: 0</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>PositionY: 0</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QPushButton" name="motor1_left">
+      <property name="text">
+       <string>Motor 1 - 100 Steps Left</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="motor1_right">
+      <property name="text">
+       <string>Motor 1 - 100 Steps Right</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="motor2_left">
+      <property name="text">
+       <string>Motor 2 - 100 Steps Left</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="motor2_right">
+      <property name="text">
+       <string>Motor 2 - 100 Steps Right</string>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QLabel" name="connectionStatusLabel">

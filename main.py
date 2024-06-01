@@ -6,7 +6,6 @@ from PyQt5.QtCore import QTimer
 import serial
 import serial.tools.list_ports
 
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -21,10 +20,18 @@ class MainWindow(QMainWindow):
         self.pushButton.clicked.connect(self.check_connection)
         self.ten_left.clicked.connect(self.send_ten_left)
         self.ten_right.clicked.connect(self.send_ten_right)
+        self.motor1_left.clicked.connect(self.send_motor1_left)
+        self.motor1_right.clicked.connect(self.send_motor1_right)
+        self.motor2_left.clicked.connect(self.send_motor2_left)
+        self.motor2_right.clicked.connect(self.send_motor2_right)
 
         # Disable command buttons initially
         self.ten_left.setEnabled(False)
         self.ten_right.setEnabled(False)
+        self.motor1_left.setEnabled(False)
+        self.motor1_right.setEnabled(False)
+        self.motor2_left.setEnabled(False)
+        self.motor2_right.setEnabled(False)
 
         # Set up a timer to periodically check the connection
         self.timer = QTimer(self)
@@ -69,6 +76,10 @@ class MainWindow(QMainWindow):
                     self.pushButton.setStyleSheet("background-color: green")
                     self.ten_left.setEnabled(True)
                     self.ten_right.setEnabled(True)
+                    self.motor1_left.setEnabled(True)
+                    self.motor1_right.setEnabled(True)
+                    self.motor2_left.setEnabled(True)
+                    self.motor2_right.setEnabled(True)
                     self.connectionStatusLabel.setText(f"Connection Status: Connected ({self.current_port})")
                 else:
                     raise serial.SerialException("Unexpected response")
@@ -79,16 +90,32 @@ class MainWindow(QMainWindow):
             self.pushButton.setStyleSheet("background-color: red")
             self.ten_left.setEnabled(False)
             self.ten_right.setEnabled(False)
+            self.motor1_left.setEnabled(False)
+            self.motor1_right.setEnabled(False)
+            self.motor2_left.setEnabled(False)
+            self.motor2_right.setEnabled(False)
             self.connectionStatusLabel.setText("Connection Status: Not Connected")
             if self.ser is not None:
                 self.ser.close()
                 self.ser = None
 
     def send_ten_left(self):
-        self.send_command('10L')
+        self.send_command('s10 200')  # Example command for 10 steps left with speed 200
 
     def send_ten_right(self):
-        self.send_command('10R')
+        self.send_command('c10 200')  # Example command for 10 steps right with speed 200
+
+    def send_motor1_left(self):
+        self.send_command('p100 200')  # 100 steps left for motor 1 with speed 200
+
+    def send_motor1_right(self):
+        self.send_command('c100 200')  # 100 steps right for motor 1 with speed 200
+
+    def send_motor2_left(self):
+        self.send_command('b100 200')  # 100 steps left for motor 2 with speed 200
+
+    def send_motor2_right(self):
+        self.send_command('c100 200')  # 100 steps right for motor 2 with speed 200
 
     def send_command(self, command):
         if self.ser and self.ser.is_open:
@@ -108,7 +135,6 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print(f"Error during communication: {e}")
                 self.responseLabel.setText(f"Error: {e}")
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
