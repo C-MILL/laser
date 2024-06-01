@@ -107,22 +107,22 @@ class MainWindow(QMainWindow):
                 self.ser = None
 
     def send_ten_left(self):
-        self.send_command('s10 200')  # Example command for 10 steps left with speed 200
+        self.send_command('s 10 200')  # Example command for 10 steps left with speed 200
 
     def send_ten_right(self):
-        self.send_command('c10 200')  # Example command for 10 steps right with speed 200
+        self.send_command('c 10 200')  # Example command for 10 steps right with speed 200
 
     def send_motor1_left(self):
-        self.send_command('p100 200')  # 100 steps left for motor 1 with speed 200
+        self.send_command('p 100 200')  # 100 steps left for motor 1 with speed 200
 
     def send_motor1_right(self):
-        self.send_command('c100 200')  # 100 steps right for motor 1 with speed 200
+        self.send_command('c 100 200')  # 100 steps right for motor 1 with speed 200
 
     def send_motor2_left(self):
-        self.send_command('b100 200')  # 100 steps left for motor 2 with speed 200
+        self.send_command('b 100 200')  # 100 steps left for motor 2 with speed 200
 
     def send_motor2_right(self):
-        self.send_command('c100 200')  # 100 steps right for motor 2 with speed 200
+        self.send_command('c 100 200')  # 100 steps right for motor 2 with speed 200
 
     def send_command(self, command):
         if self.ser and self.ser.is_open:
