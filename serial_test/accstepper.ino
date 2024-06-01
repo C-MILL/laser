@@ -5,7 +5,8 @@ long receivedDelay = 0; // delay between two steps, received from the computer
 long receivedAcceleration = 0; // acceleration value from computer
 char receivedCommand; // character for commands
 /* s = Start (CCW) // needs steps and speed values
- * o = open (CCW) // needs steps and speed values
+ * b = open stepper 2 (CCW) // needs steps and speed values
+ * p = open stepper 1 (CCW) // needs steps and speed values
  * c = close (CW) // needs steps and speed values
  * a = set acceleration // needs acceleration value
  * n = stop right now! // just the 'n' is needed
@@ -98,19 +99,40 @@ void checkSerial() // method for receiving the commands
       stepper2.move(receivedMMdistance); // set distance
     }
     // START - OPEN
-    if (receivedCommand == 'o') // OPENING
+    if (receivedCommand == 'p') // OPENING stepper 1
     {
       runallowed = true; // allow running
       receivedMMdistance = Serial.parseFloat(); // value for the steps
       receivedDelay = Serial.parseFloat(); // value for the speed
 
+      stepper1.enableOutputs(); // enable pins
+      stepper2.disableOutputs(); // disable pins
       Serial.print(receivedMMdistance); // print the values for checking
       Serial.print(receivedDelay);
       Serial.println(" OPEN"); // print the action
       stepper1.setMaxSpeed(receivedDelay); // set speed
       stepper1.move(receivedMMdistance); // set distance
+      //stepper2.setMaxSpeed(receivedDelay); // set speed
+      //stepper2.move(receivedMMdistance); // set distance
+
+    }
+
+        if (receivedCommand == 'b') // OPENING stepper 2
+    {
+      runallowed = true; // allow running
+      receivedMMdistance = Serial.parseFloat(); // value for the steps
+      receivedDelay = Serial.parseFloat(); // value for the speed
+
+      stepper2.enableOutputs(); // enable pins
+      stepper1.disableOutputs(); // disable pins
+      Serial.print(receivedMMdistance); // print the values for checking
+      Serial.print(receivedDelay);
+      Serial.println(" OPEN"); // print the action
+      //stepper1.setMaxSpeed(receivedDelay); // set speed
+      //stepper1.move(receivedMMdistance); // set distance
       stepper2.setMaxSpeed(receivedDelay); // set speed
       stepper2.move(receivedMMdistance); // set distance
+
     }
 
     // START - CLOSE
