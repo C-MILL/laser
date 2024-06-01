@@ -24,6 +24,9 @@ class MainWindow(QMainWindow):
         self.motor1_right.clicked.connect(self.send_motor1_right)
         self.motor2_left.clicked.connect(self.send_motor2_left)
         self.motor2_right.clicked.connect(self.send_motor2_right)
+        self.set_home.clicked.connect(self.set_home_position)
+        self.move_home.clicked.connect(self.move_to_home)
+        self.reset_position.clicked.connect(self.reset_position)
 
         # Disable command buttons initially
         self.ten_left.setEnabled(False)
@@ -32,6 +35,9 @@ class MainWindow(QMainWindow):
         self.motor1_right.setEnabled(False)
         self.motor2_left.setEnabled(False)
         self.motor2_right.setEnabled(False)
+        self.set_home.setEnabled(False)
+        self.move_home.setEnabled(False)
+        self.reset_position.setEnabled(False)
 
         # Set up a timer to periodically check the connection
         self.timer = QTimer(self)
@@ -56,7 +62,7 @@ class MainWindow(QMainWindow):
                 port = self.find_serial_port()
                 if port:
                     print(f"Attempting to open serial connection on {port}...")
-                    self.ser = serial.Serial(port, 115200, timeout=1)
+                    self.ser = serial.Serial(port, 9600, timeout=1)
                     self.ser.flushInput()
                     self.ser.flushOutput()
                     self.current_port = port
@@ -81,6 +87,9 @@ class MainWindow(QMainWindow):
                         self.motor1_right.setEnabled(True)
                         self.motor2_left.setEnabled(True)
                         self.motor2_right.setEnabled(True)
+                        self.set_home.setEnabled(True)
+                        self.move_home.setEnabled(True)
+                        self.reset_position.setEnabled(True)
                         self.connectionStatusLabel.setText(f"Connection Status: Connected ({self.current_port})")
                     else:
                         raise serial.SerialException("Unexpected response")
@@ -99,6 +108,9 @@ class MainWindow(QMainWindow):
             self.motor1_right.setEnabled(False)
             self.motor2_left.setEnabled(False)
             self.motor2_right.setEnabled(False)
+            self.set_home.setEnabled(False)
+            self.move_home.setEnabled(False)
+            self.reset_position.setEnabled(False)
             self.connectionStatusLabel.setText("Connection Status: Not Connected")
             if self.ser is not None:
                 self.ser.close()
@@ -121,6 +133,15 @@ class MainWindow(QMainWindow):
 
     def send_motor2_right(self):
         self.send_command('c 100 200')  # 100 steps right for motor 2 with speed 200
+
+    def set_home_position(self):
+        self.send_command('set_home')
+
+    def move_to_home(self):
+        self.send_command('move_home')
+
+    def reset_position(self):
+        self.send_command('reset_position')
 
     def send_command(self, command):
         if self.ser and self.ser.is_open:

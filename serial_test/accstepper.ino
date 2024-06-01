@@ -3,7 +3,7 @@
 long receivedMMdistance = 0; // distance in mm from the computer
 long receivedDelay = 0; // delay between two steps, received from the computer
 long receivedAcceleration = 0; // acceleration value from computer
-char receivedCommand; // character for commands
+String receivedCommand; // character for commands
 /* s = Start (CCW) // needs steps and speed values
  * b = open stepper 2 (CCW) // needs steps and speed values
  * p = open stepper 1 (CCW) // needs steps and speed values
@@ -17,6 +17,9 @@ bool newData, runallowed = false; // booleans for new data from serial, and runa
 // direction Digital 9 (CCW), pulses Digital 8 (CLK)
 AccelStepper stepper1(1, 5, 4);
 AccelStepper stepper2(1, 18, 16);
+
+long homePosition1 = 0; // Home position for stepper 1
+long homePosition2 = 0; // Home position for stepper 2
 
 void setup()
 {
@@ -77,105 +80,125 @@ void checkSerial() // method for receiving the commands
 {  
   if (Serial.available() > 0) // if something comes
   {
-    receivedCommand = Serial.read(); // this will read the command character
+    String command = Serial.readStringUntil('\n'); // read the command string until newline
+    Serial.print("Received: ");
+    Serial.println(command); // print the received command
     newData = true; // this creates a flag
+
+    if (newData == true) // if we received something (see above)
+    {
+      // Handle PING command
+      if (command == "PING") {
+        Serial.println("PONG");
+        newData = false;
+        return;
+      }
+
+      // START - MEASURE
+      if (command.startsWith("s")) // this is the measure part
+      {
+        runallowed = true; // allow running
+        receivedMMdistance = command.substring(1).toInt(); // value for the steps
+        receivedDelay = command.substring(2).toInt(); // value for the speed
+
+        Serial.print(receivedMMdistance); // print the values for checking
+        Serial.print(receivedDelay);
+        Serial.println(" Measure"); // print the action
+        stepper1.setMaxSpeed(receivedDelay); // set speed
+        stepper1.move(receivedMMdistance); // set distance
+        stepper2.setMaxSpeed(receivedDelay); // set speed
+        stepper2.move(receivedMMdistance); // set distance
+      }
+      // START - OPEN
+      else if (command.startsWith("p")) // OPENING stepper 1
+      {
+        runallowed = true; // allow running
+        receivedMMdistance = command.substring(1).toInt(); // value for the steps
+        receivedDelay = command.substring(2).toInt(); // value for the speed
+
+        stepper1.enableOutputs(); // enable pins
+        stepper2.disableOutputs(); // disable pins
+        Serial.print(receivedMMdistance); // print the values for checking
+        Serial.print(receivedDelay);
+        Serial.println(" OPEN"); // print the action
+        stepper1.setMaxSpeed(receivedDelay); // set speed
+        stepper1.move(receivedMMdistance); // set distance
+      }
+      else if (command.startsWith("b")) // OPENING stepper 2
+      {
+        runallowed = true; // allow running
+        receivedMMdistance = command.substring(1).toInt(); // value for the steps
+        receivedDelay = command.substring(2).toInt(); // value for the speed
+
+        stepper2.enableOutputs(); // enable pins
+        stepper1.disableOutputs(); // disable pins
+        Serial.print(receivedMMdistance); // print the values for checking
+        Serial.print(receivedDelay);
+        Serial.println(" OPEN"); // print the action
+        stepper2.setMaxSpeed(receivedDelay); // set speed
+        stepper2.move(receivedMMdistance); // set distance
+      }
+      // START - CLOSE
+      else if (command.startsWith("c")) // CLOSING - Rotates the motor in the opposite direction as opening
+      {
+        runallowed = true; // allow running
+        receivedMMdistance = command.substring(1).toInt(); // value for the steps
+        receivedDelay = command.substring(2).toInt(); // value for the speed
+
+        Serial.print(receivedMMdistance);  // print the values for checking
+        Serial.print(receivedDelay);
+        Serial.println(" CLOSE"); // print action
+        stepper1.setMaxSpeed(receivedDelay); // set speed
+        stepper1.move(-1 * receivedMMdistance); // set distance - negative value flips the direction
+        stepper2.setMaxSpeed(receivedDelay); // set speed
+        stepper2.move(-1 * receivedMMdistance); // set distance - negative value flips the direction
+      }
+      // STOP - STOP
+      else if (command == "n") // immediately stops the motor
+      {
+        runallowed = false; // disable running
+        stepper1.setCurrentPosition(0); // reset position
+        stepper2.setCurrentPosition(0); // reset position
+        Serial.println(" STOP"); // print action
+        stepper1.stop(); // stop motor
+        stepper1.disableOutputs(); // disable power
+        stepper2.stop(); // stop motor
+        stepper2.disableOutputs(); // disable power
+      }
+      // SET ACCELERATION
+      else if (command.startsWith("a")) // Setting up a new acceleration value
+      {
+        runallowed = false; // we still keep running disabled, since we just update a variable
+        receivedAcceleration = command.substring(1).toInt(); // receive the acceleration from serial
+
+        stepper1.setAcceleration(receivedAcceleration); // update the value of the variable
+        stepper2.setAcceleration(receivedAcceleration); // update the value of the variable
+
+        Serial.println(" ACC Updated"); // confirm update by message
+      }
+      // SET HOME POSITION
+      else if (command == "set_home")
+      {
+        homePosition1 = stepper1.currentPosition();
+        homePosition2 = stepper2.currentPosition();
+        Serial.println("Home position set");
+      }
+      // MOVE TO HOME POSITION
+      else if (command == "move_home")
+      {
+        stepper1.moveTo(homePosition1);
+        stepper2.moveTo(homePosition2);
+        runallowed = true;
+      }
+      // RESET POSITION
+      else if (command == "reset_position")
+      {
+        stepper1.setCurrentPosition(0);
+        stepper2.setCurrentPosition(0);
+        Serial.println("Position reset");
+      }
+    }
+    // after we went through the above tasks, newData becomes false again, so we are ready to receive new commands again.
+    newData = false;
   }
-
-  if (newData == true) // if we received something (see above)
-  {
-    // START - MEASURE
-    if (receivedCommand == 's') // this is the measure part
-    {
-      runallowed = true; // allow running
-      receivedMMdistance = Serial.parseFloat(); // value for the steps
-      receivedDelay = Serial.parseFloat(); // value for the speed
-
-      Serial.print(receivedMMdistance); // print the values for checking
-      Serial.print(receivedDelay);
-      Serial.println(" Measure"); // print the action
-      stepper1.setMaxSpeed(receivedDelay); // set speed
-      stepper1.move(receivedMMdistance); // set distance
-      stepper2.setMaxSpeed(receivedDelay); // set speed
-      stepper2.move(receivedMMdistance); // set distance
-    }
-    // START - OPEN
-    if (receivedCommand == 'p') // OPENING stepper 1
-    {
-      runallowed = true; // allow running
-      receivedMMdistance = Serial.parseFloat(); // value for the steps
-      receivedDelay = Serial.parseFloat(); // value for the speed
-
-      stepper1.enableOutputs(); // enable pins
-      stepper2.disableOutputs(); // disable pins
-      Serial.print(receivedMMdistance); // print the values for checking
-      Serial.print(receivedDelay);
-      Serial.println(" OPEN"); // print the action
-      stepper1.setMaxSpeed(receivedDelay); // set speed
-      stepper1.move(receivedMMdistance); // set distance
-      //stepper2.setMaxSpeed(receivedDelay); // set speed
-      //stepper2.move(receivedMMdistance); // set distance
-
-    }
-
-        if (receivedCommand == 'b') // OPENING stepper 2
-    {
-      runallowed = true; // allow running
-      receivedMMdistance = Serial.parseFloat(); // value for the steps
-      receivedDelay = Serial.parseFloat(); // value for the speed
-
-      stepper2.enableOutputs(); // enable pins
-      stepper1.disableOutputs(); // disable pins
-      Serial.print(receivedMMdistance); // print the values for checking
-      Serial.print(receivedDelay);
-      Serial.println(" OPEN"); // print the action
-      //stepper1.setMaxSpeed(receivedDelay); // set speed
-      //stepper1.move(receivedMMdistance); // set distance
-      stepper2.setMaxSpeed(receivedDelay); // set speed
-      stepper2.move(receivedMMdistance); // set distance
-
-    }
-
-    // START - CLOSE
-    if (receivedCommand == 'c') // CLOSING - Rotates the motor in the opposite direction as opening
-    {
-      runallowed = true; // allow running
-      receivedMMdistance = Serial.parseFloat(); // value for the steps
-      receivedDelay = Serial.parseFloat(); // value for the speed
-
-      Serial.print(receivedMMdistance);  // print the values for checking
-      Serial.print(receivedDelay);
-      Serial.println(" CLOSE"); // print action
-      stepper1.setMaxSpeed(receivedDelay); // set speed
-      stepper1.move(-1 * receivedMMdistance); // set distance - negative value flips the direction
-      stepper2.setMaxSpeed(receivedDelay); // set speed
-      stepper2.move(-1 * receivedMMdistance); // set distance - negative value flips the direction
-    }
-
-    // STOP - STOP
-    if (receivedCommand == 'n') // immediately stops the motor
-    {
-      runallowed = false; // disable running
-      stepper1.setCurrentPosition(0); // reset position
-      stepper2.setCurrentPosition(0); // reset position
-      Serial.println(" STOP"); // print action
-      stepper1.stop(); // stop motor
-      stepper1.disableOutputs(); // disable power
-      stepper2.stop(); // stop motor
-      stepper2.disableOutputs(); // disable power
-    }
-
-    // SET ACCELERATION
-    if (receivedCommand == 'a') // Setting up a new acceleration value
-    {
-      runallowed = false; // we still keep running disabled, since we just update a variable
-      receivedAcceleration = Serial.parseFloat(); // receive the acceleration from serial
-
-      stepper1.setAcceleration(receivedAcceleration); // update the value of the variable
-      stepper2.setAcceleration(receivedAcceleration); // update the value of the variable
-
-      Serial.println(" ACC Updated"); // confirm update by message
-    }
-  }
-  // after we went through the above tasks, newData becomes false again, so we are ready to receive new commands again.
-  newData = false;
 }
