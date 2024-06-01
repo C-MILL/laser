@@ -26,7 +26,7 @@ class MainWindow(QMainWindow):
         self.motor2_right.clicked.connect(self.send_motor2_right)
         self.set_home.clicked.connect(self.set_home_position)
         self.move_home.clicked.connect(self.move_to_home)
-        self.reset_position.clicked.connect(self.reset_position)
+        self.reset_position_btn.clicked.connect(self.reset_position_command)  # Updated
 
         # Disable command buttons initially
         self.ten_left.setEnabled(False)
@@ -37,7 +37,7 @@ class MainWindow(QMainWindow):
         self.motor2_right.setEnabled(False)
         self.set_home.setEnabled(False)
         self.move_home.setEnabled(False)
-        self.reset_position.setEnabled(False)
+        self.reset_position_btn.setEnabled(False)
 
         # Set up a timer to periodically check the connection
         self.timer = QTimer(self)
@@ -89,7 +89,7 @@ class MainWindow(QMainWindow):
                         self.motor2_right.setEnabled(True)
                         self.set_home.setEnabled(True)
                         self.move_home.setEnabled(True)
-                        self.reset_position.setEnabled(True)
+                        self.reset_position_btn.setEnabled(True)
                         self.connectionStatusLabel.setText(f"Connection Status: Connected ({self.current_port})")
                     else:
                         raise serial.SerialException("Unexpected response")
@@ -110,7 +110,7 @@ class MainWindow(QMainWindow):
             self.motor2_right.setEnabled(False)
             self.set_home.setEnabled(False)
             self.move_home.setEnabled(False)
-            self.reset_position.setEnabled(False)
+            self.reset_position_btn.setEnabled(False)
             self.connectionStatusLabel.setText("Connection Status: Not Connected")
             if self.ser is not None:
                 self.ser.close()
@@ -140,7 +140,7 @@ class MainWindow(QMainWindow):
     def move_to_home(self):
         self.send_command('move_home')
 
-    def reset_position(self):
+    def reset_position_command(self):  # Updated
         self.send_command('reset_position')
 
     def send_command(self, command):

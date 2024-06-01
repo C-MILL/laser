@@ -79,7 +79,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="reset_position">
+     <widget class="QPushButton" name="reset_position_btn">  <!-- Updated -->
       <property name="text">
        <string>Reset Position</string>
       </property>
