@@ -16,6 +16,13 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>Connection</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QPushButton" name="ten_left">
       <property name="text">
        <string>10 Steps Left</string>
